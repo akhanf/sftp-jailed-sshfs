@@ -1,0 +1,39 @@
+#!/bin/bash
+
+set -eo pipefail
+
+
+if [ "$#" -lt 1 ]
+then
+ echo "usage: sudo $0 <username>"
+ exit 0
+fi
+
+
+execpath=`dirname $0`
+execpath=`realpath $execpath`
+
+user=$1
+template_config=$execpath/template_sshd_config
+template_instructions=$execpath/template_instructions.txt
+user_txt=users/$user.txt
+
+adduser --disabled-login --no-create-home --gecos "" --ingroup sftpusers $user
+password=`pwgen -1`
+cp $template_instructions $user_txt
+echo "username: $user" >> $user_txt
+echo "password: $password" >> $user_txt
+
+chpasswd <<<"$user:$password"
+
+#create the folder and set permissions
+mkdir -p /var/sftp/$user/home
+chown $user /var/sftp/$user/home
+chgrp sftpusers /var/sftp/$user/home
+chmod g+rwX /var/sftp/$user/home
+
+echo "" >> /etc/ssh/sshd_config
+echo "Match User $user" >> /etc/ssh/sshd_config
+echo "ChrootDirectory /var/sftp/$user" >> /etc/ssh/sshd_config
+cat $template_config >> /etc/ssh/sshd_config
+

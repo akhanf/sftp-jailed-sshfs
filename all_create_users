@@ -1,0 +1,34 @@
+#!/bin/bash
+
+#set -eo pipefail
+
+
+if [ "$#" -lt 1 ]
+then
+ echo "usage: sudo $0 <csv>"
+ exit 0
+fi
+
+execpath=`dirname $0`
+execpath=`realpath $execpath`
+
+
+csv=$1
+
+for user in `cat $csv  | awk -F, '{print $1}'`
+do
+
+ echo $user
+ id $user &> /dev/null
+ if [[ $? == 0 ]]
+ then
+	 echo "$user already exists, skipping"
+ else
+	 echo "creating $user..."
+	 $execpath/sftp_create_user $user
+ fi
+ 
+done
+
+#restart ssh server
+systemctl restart sshd

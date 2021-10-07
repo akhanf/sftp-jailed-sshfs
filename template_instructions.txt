@@ -1,0 +1,15 @@
+Instructions for connecting to the SFTP server:
+
+1. Get the IP (IPv4) address of the machine you will be connecting from, e.g. by navigating to the following webpage: http://www.icanhasyourip.com/
+
+2. Reply to this e-mail with your IP address
+
+3. Once the administrators have added your IP to the list (may take several hours after your e-mail), you will be able to connect.
+
+4. You can use any GUI-based FTP client (e.g., Filezilla, Cyberduck, MobaXTerm, etc.).
+
+Below are your connection details:
+
+host: <IP_ADDRESS_HERE>
+protocol: sftp
+port: 22

@@ -1,0 +1,7 @@
+ForceCommand internal-sftp
+PasswordAuthentication yes
+PubkeyAuthentication no
+PermitTunnel no
+AllowAgentForwarding no
+AllowTcpForwarding no
+X11Forwarding no

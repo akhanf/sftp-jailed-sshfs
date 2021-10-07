@@ -1,0 +1,35 @@
+#!/bin/bash
+
+set -eo pipefail
+
+
+if [ "$#" -lt 3 ]
+then
+ echo "usage: $0 <username> <remote_path> <ssh_key> <writable - 1>"
+ exit 0
+fi
+
+
+execpath=`dirname $0`
+execpath=`realpath $execpath`
+
+user=$1
+remote_path=$2
+ssh_key=$3
+if [ "$#" -gt 3 ]
+then
+	writable=$4
+fi
+
+uid=`id -u $user`
+gid=1001 #hardcoded gid for sftpusers
+
+#echo sshfs#$remote_path /var/sftp/$user/home fuse defaults,follow_symlinks,allow_other,idmap=user,uid=$uid,gid=$gid,reconnect,delay_connect,ConnectTimeout=5,ServerAliveInterval=5,ro,IdentityFile=${ssh_key}  0 0 >> /etc/fstab
+if [ "$writable" = "1" ]
+then
+echo "setting $remote_path as writable"
+sshfs -o IdentityFile=${ssh_key} -o follow_symlinks,allow_other,idmap=user,uid=$uid,gid=$gid,reconnect,delay_connect,ConnectTimeout=5,ServerAliveInterval=5 $remote_path /var/sftp/$user/home
+else
+sshfs -o IdentityFile=${ssh_key} -o follow_symlinks,allow_other,idmap=user,uid=$uid,gid=$gid,reconnect,delay_connect,ConnectTimeout=5,ServerAliveInterval=5,ro $remote_path /var/sftp/$user/home
+fi
+

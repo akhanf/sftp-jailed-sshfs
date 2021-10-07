@@ -1,0 +1,41 @@
+#!/bin/bash
+
+#set -eo pipefail
+
+
+if [ "$#" -lt 1 ]
+then
+ echo "usage: sudo $0 <csv>"
+ exit 0
+fi
+
+execpath=`dirname $0`
+execpath=`realpath $execpath`
+
+
+csv=$1
+ssh_key=~/.ssh/id_rsa #YOU NEED TO UPDATE THIS
+
+linenum=1
+for user in `cat $csv  | awk -F, '{print $1}'`
+do
+
+ remote_path=`cat $csv | head -n $linenum | tail -n 1 |  awk -F, '{print $2}'`
+
+ echo $user
+ echo $remote_path
+ id $user &> /dev/null
+ if [[ $? == 0 ]]
+ then
+	 echo "Unmounting share for user $user"
+	 fusermount -u /var/sftp/$user/home
+#	 echo "Mounting share for $user"
+#	 $execpath/sftp_mount_sshfs $user $remote_path $ssh_key
+ else
+	 echo "User $user does not exist!"
+	 continue
+ fi
+
+ linenum=$((linenum+1)) 
+done
+
